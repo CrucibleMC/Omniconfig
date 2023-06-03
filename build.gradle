@@ -1,0 +1,55 @@
+apply plugin: 'base'
+apply plugin: 'maven-publish'
+
+version = '1.0.0'
+group = 'io.github.crucible'
+
+var buildTimestamp = new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+subprojects {
+    group = rootProject.group
+    version = rootProject.version
+
+    repositories {
+        mavenLocal()
+    }
+
+    afterEvaluate {
+        dependencies {
+            compileOnly 'org.jetbrains:annotations:20.1.0'
+        }
+
+        jar {
+            manifest {
+                attributes([
+                        "Specification-Title"       : rootProject.name,
+                        "Specification-Vendor"     : "CrucibleMC Team",
+                        "Specification-Version"    : "1",
+                        "Implementation-Title"     : rootProject.name + '-' + project.name,
+                        "Implementation-Version"   : project.version,
+                        "Implementation-Vendor"    : "CrucibleMC Team",
+                        "Implementation-Timestamp" : buildTimestamp,
+                ])
+            }
+        }
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            subprojects.each {
+                it.afterEvaluate {
+                    it.configurations.archives.allArtifacts.forEach {
+                        artifact it
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            url = buildDir.absolutePath + "/repo"
+            name = "filesystem"
+        }
+    }
+}

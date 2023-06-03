@@ -1,0 +1,6 @@
+rootProject.name = 'omniconfig'
+include(
+        'shared',
+        'mc1.12.2',
+        'mc1.7.10'
+)

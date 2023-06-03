@@ -1,0 +1,88 @@
+// We need shared to be evaluated before we access anything from it
+project.evaluationDependsOn(":shared")
+
+// Shared configuration across the version specific projects
+configurations {
+    // Gradle approved way depending on cross project task output
+    sharedJar {
+        canBeConsumed = false
+        canBeResolved = true
+    }
+}
+
+dependencies {
+    // Depend on the 'arquives' configuration, it is the configuration the task jar outputs to by default
+    implementation project(path: ':shared', configuration: 'archives')
+    sharedJar project(path: ':shared', configuration: 'shareJar') // Required to embed the api jar within the mod jar
+}
+
+tasks.register('devJar', Jar) {
+    archiveBaseName = rootProject.name
+    archiveClassifier = project.name +  '-dev'
+    from sourceSets.main.output
+}
+
+tasks.register('sourcesJar', Jar) {
+    archiveBaseName = rootProject.name
+    archiveClassifier = project.name +  '-dev-sources'
+    from sourceSets.main.allSource
+    from project(':shared').sourceSets.main.allSource // TODO: Not depend on sourceSet directly
+}
+
+javadoc {
+    source project(':shared').sourceSets.main.allSource // TODO: Not depend on sourceSet directly
+    options.addStringOption('Xdoclint:none', '-quiet')
+}
+
+tasks.register('javadocJar', Jar) {
+    dependsOn javadoc
+    archiveBaseName = rootProject.name
+    archiveClassifier = project.name + '-dev-javadoc'
+    from javadoc.destinationDir
+}
+
+['jar', 'devJar'].each {
+    tasks.named(it).configure {
+        // Embed the "api" jar contents into the mod jar
+        from configurations.named('sharedJar').map {
+            zipTree(it.singleFile)
+        }
+    }
+}
+
+jar {
+    archiveBaseName = rootProject.name
+    archiveClassifier = project.name
+
+            manifest {
+        attributes([
+                "ForceLoadAsMod"              : 'true',
+                'FMLCorePluginContainsFMLMod' : 'true',
+                'FMLCorePlugin'               : 'io.github.crucible.omniconfig.'+ project.name +'.OmniconfigCoremod'
+        ])
+    }
+
+}
+
+// Copy the normal jar manifest into the dev jar
+afterEvaluate {
+    devJar.manifest.attributes(jar.manifest.attributes)
+}
+
+artifacts {
+    archives devJar
+    archives sourcesJar
+    archives javadocJar
+}
+
+processResources {
+    inputs.property 'version', project.version
+    inputs.property 'mod_id', project.property('mod_id')
+    inputs.property 'mod_name', project.property('mod_name')
+
+    filesMatching('mcmod.info') {
+        expand 'version':project.version,
+                'mod_id':project.property('mod_id'),
+                'mod_name':project.property('mod_name')
+    }
+}

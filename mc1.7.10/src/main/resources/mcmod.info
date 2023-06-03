@@ -1,0 +1,20 @@
+[
+  {
+    "modid": "${mod_id}",
+    "name": "${mod_name}",
+    "mcversion": "1.7.10",
+    "description": "The version independent configuration API.",
+    "version": "${version}",
+    "url": "https://github.com/CrucibleMC/Omniconfig",
+    "updateUrl": "",
+    "authorList": [
+      "Aizistral",
+      "juanmuscaria",
+      "CrucibleMC Team"
+    ],
+    "credits": "Aizistral for making the entire API",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]

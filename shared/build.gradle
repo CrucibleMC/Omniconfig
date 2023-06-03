@@ -1,0 +1,71 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+apply plugin: 'java-library'
+
+configurations {
+    shareJar {
+        canBeConsumed = true
+        canBeResolved = false
+    }
+}
+
+dependencies {
+    // Those libraries should be present in minecraft
+    implementation 'org.apache.logging.log4j:log4j-api:2.0-beta9'
+    implementation 'com.google.guava:guava:17.0' // Guava is tricky, we should avoid using it
+    implementation 'com.google.code.gson:gson:2.2.4'
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
+}
+
+tasks.register('deleteSource', Delete) {
+    delete "$buildDir/src"
+}
+
+tasks.register('processSource', Sync) {
+    from sourceSets.main.java
+    inputs.property 'version', version
+    filter(ReplaceTokens, tokens: [
+            VERSION: project.version,
+            MOD_ID: project.property("mod_id"),
+            MOD_NAME: project.property("mod_name")
+    ])
+    into "$buildDir/src"
+}
+
+compileJava {
+    source = processSource.outputs
+}
+
+compileJava.finalizedBy deleteSource
+
+jar {
+    archiveBaseName = rootProject.name
+}
+
+tasks.register('sourcesJar', Jar) {
+    archiveBaseName = rootProject.name
+    archiveClassifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+javadoc {
+    options.addStringOption('Xdoclint:none', '-quiet')
+}
+
+tasks.register('javadocJar', Jar) {
+    dependsOn javadoc
+    archiveBaseName = rootProject.name
+    archiveClassifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+    shareJar jar
+}
