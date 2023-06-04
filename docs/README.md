@@ -10,4 +10,4 @@ now offered as a standalone API.
 
 Omniconfig has two ways to declare a configuration file, either by `IOmniconfigBuilder` or `@AnnotationConfig`
 
-TODO: Examples and proper explanation in how to use t
+TODO: Examples and proper explanation in how to use it

@@ -58,7 +58,7 @@ jar {
         attributes([
                 "ForceLoadAsMod"              : 'true',
                 'FMLCorePluginContainsFMLMod' : 'true',
-                'FMLCorePlugin'               : 'io.github.crucible.omniconfig.'+ project.name +'.OmniconfigCoremod'
+                'FMLCorePlugin'               : 'io.github.cruciblemc.omniconfig.'+ project.name +'.OmniconfigCoremod'
         ])
     }
 
@@ -81,8 +81,8 @@ processResources {
     inputs.property 'mod_name', project.property('mod_name')
 
     filesMatching('mcmod.info') {
-        expand 'version':project.version,
-                'mod_id':project.property('mod_id'),
-                'mod_name':project.property('mod_name')
+        expand  'version'  : project.version,
+                'mod_id'   : project.property('mod_id'),
+                'mod_name' : project.property('mod_name')
     }
 }

@@ -1,0 +1,59 @@
+package io.github.cruciblemc.omniconfig.mc1_7_10.network;
+
+import java.util.Objects;
+
+import org.jetbrains.annotations.NotNull;
+
+import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
+import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import io.github.cruciblemc.omniconfig.mc1_7_10.handlers.OmniPacketDispatcher;
+import io.github.cruciblemc.omniconfig.OmniconfigCore;
+import io.github.cruciblemc.omniconfig.api.lib.Either;
+import io.github.cruciblemc.omniconfig.core.Omniconfig;
+import io.github.cruciblemc.omniconfig.core.OmniconfigRegistry;
+import io.github.cruciblemc.omniconfig.core.SynchronizationManager;
+import io.github.cruciblemc.omniconfig.core.SynchronizationManager.SyncData;
+import io.netty.buffer.ByteBuf;
+
+public class PacketSyncOmniconfig implements IMessage {
+    private final OmniPacketDispatcher dispatcher = OmniPacketDispatcher.INSTANCE;
+    private Either<Omniconfig, SyncData> either;
+
+    public PacketSyncOmniconfig(@NotNull Omniconfig wrapper) {
+        this.either = Either.fromFirst(Objects.requireNonNull(wrapper));
+    }
+
+    public PacketSyncOmniconfig() {
+        // NO-OP
+    }
+
+    @Override
+    public void fromBytes(ByteBuf buf) {
+        this.either = Either.fromSecond(SynchronizationManager.readData(this.dispatcher.getBufferIO(buf)));
+    }
+
+    @Override
+    public void toBytes(ByteBuf buf) {
+        SynchronizationManager.writeData(this.either.getFirst(), this.dispatcher.getBufferIO(buf));
+    }
+
+    public static class Handler implements IMessageHandler<PacketSyncOmniconfig, IMessage> {
+
+        @Override
+        @SideOnly(Side.CLIENT)
+        public IMessage onMessage(PacketSyncOmniconfig message, MessageContext ctx) {
+            OmniconfigCore.onRemoteServer = true;
+
+            message.either.ifSecond(data ->
+            OmniconfigRegistry.INSTANCE.getConfig(data.getFileID()).ifPresent(wrapper ->
+            SynchronizationManager.updateData((Omniconfig) wrapper, data)));
+
+            return null;
+        }
+    }
+
+}
+

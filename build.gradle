@@ -2,7 +2,41 @@ apply plugin: 'base'
 apply plugin: 'maven-publish'
 
 version = '1.0.0'
-group = 'io.github.crucible'
+group = 'io.github.cruciblemc'
+
+publishing {
+    publications {
+        create("maven", MavenPublication) {
+            artifactId = 'omniconfig'
+
+            pom {
+                name.set('Omniconfig')
+                description.set('Version-independent mod configuration API')
+                url.set('https://github.com/CrucibleMC/Omniconfig')
+
+                licenses {
+                    license {
+                        name.set('Lesser GNU Public License, Version 2.1')
+                        url.set('https://www.gnu.org/licenses/lgpl-2.1.html')
+                    }
+                }
+
+                scm {
+                    url.set("https://github.com/CrucibleMC/Omniconfig")
+                    connection.set("scm:git:git://github.com/CrucibleMC/Omniconfig.git")
+                    developerConnection.set("scm:git:git@github.com:CrucibleMC/Omniconfig.git")
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            url = buildDir.absolutePath + "/repo"
+            name = "filesystem"
+        }
+    }
+}
 
 var buildTimestamp = new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
 subprojects {
@@ -21,7 +55,7 @@ subprojects {
         jar {
             manifest {
                 attributes([
-                        "Specification-Title"       : rootProject.name,
+                        "Specification-Title"      : rootProject.name,
                         "Specification-Vendor"     : "CrucibleMC Team",
                         "Specification-Version"    : "1",
                         "Implementation-Title"     : rootProject.name + '-' + project.name,
@@ -31,25 +65,10 @@ subprojects {
                 ])
             }
         }
-    }
-}
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            subprojects.each {
-                it.afterEvaluate {
-                    it.configurations.archives.allArtifacts.forEach {
-                        artifact it
-                    }
-                }
-            }
-        }
-    }
-    repositories {
-        maven {
-            url = buildDir.absolutePath + "/repo"
-            name = "filesystem"
+        // TODO: Better way of doing this????
+        configurations.archives.allArtifacts.forEach {
+            rootProject.extensions.publishing.publications.maven.artifact it
         }
     }
 }
