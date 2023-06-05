@@ -1,0 +1,2 @@
+before_install:
+  - ./gradlew :mc1.7.10:setupCIWorkspace
