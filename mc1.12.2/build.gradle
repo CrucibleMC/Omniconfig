@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        mavenLocal()
+        mavenCentral()
         maven {
             name = "forge"
             url = "https://maven.minecraftforge.net"
