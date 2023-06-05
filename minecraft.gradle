@@ -58,7 +58,7 @@ jar {
         attributes([
                 "ForceLoadAsMod"              : 'true',
                 'FMLCorePluginContainsFMLMod' : 'true',
-                'FMLCorePlugin'               : 'io.github.cruciblemc.omniconfig.'+ project.name +'.OmniconfigCoremod'
+                'FMLCorePlugin'               : 'io.github.cruciblemc.omniconfig.'+ project.name.replace('.', '_') +'.OmniconfigCoremod'
         ])
     }
 
