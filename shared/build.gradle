@@ -14,6 +14,9 @@ dependencies {
     implementation 'org.apache.logging.log4j:log4j-api:2.0-beta9'
     implementation 'com.google.guava:guava:17.0' // Guava is tricky, we should avoid using it
     implementation 'com.google.code.gson:gson:2.2.4'
+
+    // Testing stuff
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
 }
 
 java {
@@ -68,4 +71,8 @@ artifacts {
     archives sourcesJar
     archives javadocJar
     shareJar jar
+}
+
+test {
+    useJUnitPlatform()
 }
