@@ -8,6 +8,10 @@ now offered as a standalone API.
 * Forge 1.7.10
 * Forge 1.12.2
 
+### Downloads
+* [GitHub Releases](https://github.com/CrucibleMC/Omniconfig/releases)
+* [Modrinth](https://modrinth.com/mod/omniconfig)
+* [CurseForge](https://www.curseforge.com/minecraft/mc-mods/omniconfig)
 
 ## Getting Started
 To get started with Omniconfig, add the Omniconfig dependency to your project:
