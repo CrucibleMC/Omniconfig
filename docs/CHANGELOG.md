@@ -1,5 +1,9 @@
-# Grimoire Changelog
+# Omniconfig Changelog
 Global log for all Omniconfig changes.
+
+## Release v1.0.1
+
+- Upstream change: "Fix synchronization for annotation config".
 
 ## Release v1.0.0
 
